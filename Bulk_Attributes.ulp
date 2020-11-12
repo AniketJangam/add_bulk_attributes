@@ -1,0 +1,273 @@
+ #usage	"<b>Set attributes for whole schematic</b>\n"
+		"<author>Author: Aniket Jangam</author>"
+
+string Names,result;
+string s,t;
+string strAttrName, strAttrName1, strAttrName2;
+string strPartSelAttrib, strPartAttrib, strPrefixSelAttrib, strPrefixAttrib;
+string strAttrPartValue, strAttrPrefixValue, strAttrValue, strAttrValue1, strAttrValue2;
+int Number=0;
+string cmd;
+int next_sheet;
+int scnt;
+int previous_sheet;
+
+//string PART_VALUE;		//part value for which you want to add the attributes
+//string SPICEPREFIX_VALUE;		//modify this as per your part's unique attribute
+
+string SelPart[] = {
+	"Value"
+};
+
+string SelPrefix[] = {
+	"R",
+	"C",
+	"L"
+};
+
+string strAttribs[] = {
+    "MPN",     		// 0  part number (mfg specific)
+    "BOM",         	// 1  BOM options for bom-ex.ulp
+    "DNP",         	// 2  do not place (T=TRUE/F=FALSE)
+    "MF",          	// 3 generic option text
+    "DESCRIPTION"        	// 4 generic option text
+};
+
+// some common values for attributes above
+string strPartVal0  = "?";
+string strPrefixVal0 = "R : C : L";
+string strVal0  = "?";
+string strVal1  = "EXCLUDE : INCLUDE";
+string strVal2  = "T : F";
+string strVal3 = "AVX Corporation : Yageo";
+string strVal4= "?";
+
+string strValues[];
+string strPartValue[];
+string strPrefixValue[];
+
+int nPartAtrrib  = 0;
+int nPartValue  = 0;
+int nPrefixAttrib  = 0;
+int nPrefixValue  = 0;
+int nSelAttr  = 0; 	// combo box selection set to MPN
+int nSelValue = 0;	// combo box selection set to MPN
+int nSelAttr1  = 4; 	// combo box selection set to MF
+int nSelValue1 = 4;	// combo box selection set to MF
+int nSelAttr2  = 3; 	// combo box selection set to DESCRIPTION
+int nSelValue2 = 3;	// combo box selection set to DESCRIPTION
+
+// Combo Selection Change Notification Handlers
+
+void OnComboChangeValue()
+{
+    strAttrPartValue = strPartValue[nPartValue];
+    strAttrPrefixValue = strPrefixValue[nPrefixValue];
+    strAttrValue = strValues[nSelValue];
+    strAttrValue1 = strValues[nSelValue1];
+    strAttrValue2 = strValues[nSelValue2];
+}
+
+void OnComboChangeAttr()
+{
+    strPartSelAttrib = SelPart[nPartAtrrib];
+    strPrefixSelAttrib = SelPrefix[nPrefixAttrib];
+    strAttrName = strAttribs[nSelAttr];
+    strAttrName1 = strAttribs[nSelAttr1];
+    strAttrName2 = strAttribs[nSelAttr2];
+
+     switch(nPartAtrrib)
+    {
+    case 0:
+        strsplit(strPartValue, strPartVal0, ':');
+        break;
+    }
+
+   switch(nPrefixAttrib)
+    {
+    case 0:
+        strsplit(strPrefixValue, strPrefixVal0, ':');
+        break;
+    }
+
+    switch(nSelAttr)
+    {
+    case 0:
+        strsplit(strValues, strVal0, ':');
+        break;
+    case 1:
+        strsplit(strValues, strVal1, ':');
+        break;
+    case 2:
+        strsplit(strValues, strVal2, ':');
+        break;
+    case 3:
+        strsplit(strValues, strVal3, ':');
+        break;
+    case 4:
+        strsplit(strValues, strVal4, ':');
+        break;
+    }
+
+ switch(nSelAttr1)
+    {
+    case 0:
+        strsplit(strValues, strVal0, ':');
+        break;
+    case 1:
+        strsplit(strValues, strVal1, ':');
+        break;
+    case 2:
+        strsplit(strValues, strVal2, ':');
+        break;
+    case 3:
+        strsplit(strValues, strVal3, ':');
+        break;
+    case 4:
+        strsplit(strValues, strVal4, ':');
+        break;
+    }
+
+ switch(nSelAttr2)
+    {
+    case 0:
+        strsplit(strValues, strVal0, ':');
+        break;
+    case 1:
+        strsplit(strValues, strVal1, ':');
+        break;
+    case 2:
+        strsplit(strValues, strVal2, ':');
+        break;
+    case 3:
+        strsplit(strValues, strVal3, ':');
+        break;
+    case 4:
+        strsplit(strValues, strVal4, ':');
+        break;
+    }
+
+    strAttrValue = strValues[0];
+    strAttrValue1 = strValues[1];
+    strAttrValue2 = strValues[2];
+}
+
+
+
+// pre-set to denote initial value/program entry
+previous_sheet = 999;
+
+// Preset to sheet 1 and parse 1 to N sheets to check all parts
+sprintf(s, "EDIT .s%d;\n", 1);
+cmd += s;
+
+//
+// load total schematic
+//
+schematic(S)
+ {
+
+        int nResult = dlgDialog("Add Attributes")
+        {
+            dlgHBoxLayout
+            {
+                dlgGroup("Attribute")
+                {
+	dlgGridLayout
+                    {
+                        dlgCell(1,0) dlgLabel("Part Value");
+                        dlgCell(1,1) dlgStringEdit(strAttrPartValue);
+                        dlgCell(1,2) dlgComboBox(SelPart, nPartValue) OnComboChangeValue();
+
+                        dlgCell(2,0) dlgLabel("SPICE Prefix");
+                        dlgCell(2,1) dlgStringEdit(strPrefixSelAttrib);
+                        dlgCell(2,2) dlgComboBox(SelPrefix, nPrefixValue) OnComboChangeAttr();
+	}
+
+                    dlgGridLayout
+                    {
+                        dlgCell(1,0) dlgLabel("Name");
+                        dlgCell(1,1) dlgStringEdit(strAttrName);
+                        dlgCell(1,2) dlgComboBox(strAttribs, nSelAttr) OnComboChangeAttr();
+
+                        dlgCell(2,0) dlgLabel("Value");
+                        dlgCell(2,1) dlgStringEdit(strAttrValue);
+                        dlgCell(2,2) dlgComboBox(strValues, nSelValue) OnComboChangeValue();
+
+                        dlgCell(3,0) dlgLabel("Name");
+                        dlgCell(3,1) dlgStringEdit(strAttrName1);
+                        dlgCell(3,2) dlgComboBox(strAttribs, nSelAttr1) OnComboChangeAttr();
+
+                        dlgCell(4,0) dlgLabel("Value");
+                        dlgCell(4,1) dlgStringEdit(strAttrValue1);
+                        dlgCell(4,2) dlgComboBox(strValues, nSelValue1) OnComboChangeValue();
+
+                        dlgCell(5,0) dlgLabel("Name");
+                        dlgCell(5,1) dlgStringEdit(strAttrName2);
+                        dlgCell(5,2) dlgComboBox(strAttribs, nSelAttr2) OnComboChangeAttr();
+
+                        dlgCell(6,0) dlgLabel("Value");
+                        dlgCell(6,1) dlgStringEdit(strAttrValue2);
+                        dlgCell(6,2) dlgComboBox(strValues, nSelValue2) OnComboChangeValue();
+                    }
+                }
+            }
+            dlgHBoxLayout
+            {
+                dlgPushButton("Add") dlgAccept(1);
+                dlgPushButton("Remove") dlgAccept(2);
+                dlgPushButton("-Cancel") dlgReject();
+            }
+        };
+
+        if (!nResult)
+            exit(0);
+	
+ // Iterate through parts
+
+	 S.parts(P)
+ 	{
+ 	// 
+ 	// Get instance (sheet) part is on
+ 	 P.instances(I)
+	 {				
+		 // check to see if part has the right value
+		 if((P.value == strAttrPartValue)){
+			P.attributes(A)
+			{
+			// check to see if it has the correct Prefix
+			if(A.name == "SPICEPREFIX" && (A.value == strPrefixSelAttrib)){
+				Number++;
+				// figure out if we need to change schematic sheets or not
+				if(previous_sheet == 999){	// first entry?
+					sprintf(s, "EDIT .s%d;\n", I.sheet);
+					cmd += s;									
+					}else{
+					if(I.sheet != previous_sheet){
+					sprintf(s, "EDIT .s%d;\n", I.sheet);
+					cmd += s;	
+					}
+				}
+	
+			// append command to change attribute to cmd string variable
+			sprintf(s, "CHANGE DISPLAY %s;\n", "OFF");
+                                		cmd += s;
+			sprintf(s, "ATTRIBUTE %s %s '%s';\n", P.name, strAttrName, strAttrValue);
+			cmd += s;
+			sprintf(s, "CHANGE DISPLAY %s;\n", "OFF");
+                                		cmd += s;
+			sprintf(s, "ATTRIBUTE %s %s '%s';\n", P.name, strAttrName1, strAttrValue1);
+			cmd += s;
+			sprintf(s, "CHANGE DISPLAY %s;\n", "OFF");
+                                		cmd += s;
+			sprintf(s, "ATTRIBUTE %s %s '%s';\n", P.name, strAttrName2, strAttrValue2);
+			cmd += s;
+			previous_sheet = I.sheet;
+			}
+		}
+	}
+	}
+}				
+}
+
+exit(cmd);
